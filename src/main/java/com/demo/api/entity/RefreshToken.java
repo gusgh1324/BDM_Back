@@ -7,20 +7,19 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class RefreshToken {
+public class RefreshToken extends BaseEntity { //리프레시 토큰을 저장하는 엔티티 클래스
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(updatable = false)
   private Long id;
 
-  @Column(nullable = false, unique = true)
+  @Column(name = "user_id", nullable = false, unique = true)
   private Long userId;
 
-  @Column(nullable = false)
-  private String refreshToken;
+  @Column(name = "token", nullable = false)
+  private String token;
 
-  public RefreshToken update(String refreshToken){
-    this.refreshToken = refreshToken;
-    return this;
+  public void update(String token){
+    this.token = token;
   }
 }

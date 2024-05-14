@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Log4j2
 @RequestMapping("/test")
-public class TestController {
+public class PhotoController {
   @GetMapping("/info")
   public ResponseEntity<String> info() {
     return new ResponseEntity<>("hello", HttpStatus.OK);

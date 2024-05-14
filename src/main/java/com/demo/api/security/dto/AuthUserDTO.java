@@ -15,7 +15,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
-public class AuthMemberDTO extends User implements OAuth2User {
+public class AuthUserDTO extends User implements OAuth2User {
   private String email;
   private Long mno;
   private String password;
@@ -23,18 +23,19 @@ public class AuthMemberDTO extends User implements OAuth2User {
   private boolean fromSocial;
   private Map<String, Object> attr;
 
-  public AuthMemberDTO(String username, Long mno, String password, boolean fromSocial, Collection<? extends GrantedAuthority> authorities){
+  public AuthUserDTO(String username, Long mno, String name, String password, boolean fromSocial, Collection<? extends GrantedAuthority> authorities){
     super(username, password, authorities);
     this.email = username; // security 사용자가 생성한 계정을 DB의 계정과 연결하는 부분(중요)
     this.mno = mno;
-    this.password = password;
+    this.name = name;
     this.fromSocial = fromSocial;
   }
-
-  public AuthMemberDTO(String username, Long mno, String password, boolean fromSocial, Collection<? extends GrantedAuthority> authorities, Map<String, Object> arrt){
-    this(username, mno, password, fromSocial, authorities);
-    this.attr=attr;
+  public AuthUserDTO(String username, Long mno, String password, boolean fromSocial, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attr) {
+    this(username, mno, null, password, fromSocial, authorities);
+    this.attr = attr;
   }
+
+
 
   @Override
   public Map<String, Object> getAttributes() {

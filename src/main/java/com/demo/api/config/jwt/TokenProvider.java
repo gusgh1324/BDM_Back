@@ -1,9 +1,9 @@
 package com.demo.api.config.jwt;
 
-import com.demo.api.entity.Members;
+import com.demo.api.entity.User;
 import com.demo.api.entity.RefreshToken;
 import com.demo.api.repository.RefreshTokenRepository;
-import com.demo.api.security.dto.AuthMemberDTO;
+import com.demo.api.security.dto.AuthUserDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
@@ -18,16 +18,13 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 @Log4j2
-public class TokenPrivider {
+public class TokenProvider {
   private final JwtProperties jwtProperties;
   private static final String AUTHORITIES_KEY = "auth";
   private static final String BEARER_TYPE = "Bearer";
@@ -35,13 +32,13 @@ public class TokenPrivider {
   private final RefreshTokenRepository refreshTokenRepository;
 
   // token 생성 method
-  public String generateToken(Members members, Duration expiredAt) {
+  public String generateToken(User user, Duration expiredAt) {
     Date now = new Date();
-    return makeToken(new Date((now.getTime() + expiredAt.toMillis())), members);
+    return makeToken(new Date((now.getTime() + expiredAt.toMillis())), user);
   }
 
   // token 생성 method
-  private String makeToken(Date expiry, Members members) {
+  private String makeToken(Date expiry, User user) {
     Date now = new Date();
     key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
     return Jwts.builder()
@@ -51,9 +48,9 @@ public class TokenPrivider {
         .issuer(jwtProperties.getIssuer())
         .issuedAt(now)
         .expiration(expiry)
-        .subject(members.getEmail())
-        .claim(AUTHORITIES_KEY, members.getRoleSet())
-        .claim("id", members.getMno())
+        .subject(user.getEmail())
+        .claim(AUTHORITIES_KEY, user.getRoleSet())
+        .claim("id", user.getMno())
         .signWith(key)
         .compact();
   }
@@ -81,7 +78,7 @@ public class TokenPrivider {
     } else {
       refreshTokenEntity = RefreshToken.builder()
           .userId(mno)
-          .refreshToken(refreshToken)
+          .token(refreshToken)
           .build();
     }
 
@@ -128,7 +125,7 @@ public class TokenPrivider {
             .collect(Collectors.toSet());
 
     // security context principal 저장하기 위한 객체 생성
-    UserDetails principal = new AuthMemberDTO(claims.getSubject(), claims.get("id", Long.class), "", false, authorities);
+    UserDetails principal = new AuthUserDTO(claims.getSubject(), claims.get("id", Long.class), claims.getSubject(), false, new ArrayList<>(authorities), null);
     return new UsernamePasswordAuthenticationToken(principal, "", authorities);
   }
 

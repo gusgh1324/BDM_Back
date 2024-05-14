@@ -1,13 +1,12 @@
 package com.demo.api.security.filter;
 
-import com.demo.api.security.dto.AuthMemberDTO;
+import com.demo.api.security.dto.AuthUserDTO;
 import com.demo.api.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -47,7 +46,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     super.successfulAuthentication(request, response, chain, authResult);
 //    log.info("ApiLoginFilter..........successfulAuthentication...authResult:" + authResult);
     log.info("authResult.getPrincipal(): " + authResult.getPrincipal());
-    String email = ((AuthMemberDTO) (authResult.getPrincipal())).getUsername();
+    String email = ((AuthUserDTO) (authResult.getPrincipal())).getUsername();
     String token = null;
     try {
       token = jwtUtil.generateToken(email);

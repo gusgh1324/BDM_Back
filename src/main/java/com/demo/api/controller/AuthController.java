@@ -1,8 +1,8 @@
 package com.demo.api.controller;
 
-import com.demo.api.dto.MembersDTO;
+import com.demo.api.dto.UserDTO;
 import com.demo.api.dto.ResponseDTO;
-import com.demo.api.security.service.MembersService;
+import com.demo.api.security.service.UserService;
 import com.demo.api.security.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,13 +28,13 @@ import java.util.Map;
 @RequestMapping("auth")
 @RequiredArgsConstructor
 public class AuthController {
-  private final MembersService membersService;
+  private final UserService userService;
   private final JWTUtil jwtUtil;
 
   @PostMapping(value = "/join")
-  public ResponseEntity<Long> register(@RequestBody MembersDTO membersDTO) {
-    log.info("register..." + membersDTO);
-    long num = membersService.registMembersDTO(membersDTO);
+  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
+    log.info("register..." + userDTO);
+    long num = userService.registerUser(userDTO);
     return new ResponseEntity<>(num, HttpStatus.OK);
   }
 
@@ -44,7 +43,7 @@ public class AuthController {
     String email = mapObj.get("email").toString();
     String pass = mapObj.get("pass").toString();
     log.info(email + "/" + pass);
-    String token = membersService.login(email, pass, jwtUtil);
+    String token = userService.login(email, pass, jwtUtil);
     Map<String, String > map= new HashMap<>();
     if (token != "" && token.length() > 1) {
       /*try {
