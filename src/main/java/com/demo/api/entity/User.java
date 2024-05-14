@@ -42,6 +42,9 @@ public class User extends BaseEntity {
   @Column(name = "data_storage")
   private Long dataStorage;
 
+  @Column(name = "from_social")
+  private boolean fromSocial;
+
   //role 필드는 사용자의 역할을 나타내며, UserRole 열거형을 사용합니다.
   // @Enumerated 어노테이션을 사용하여 열거형과 문자열 간의 매핑을 설정
   @Enumerated(EnumType.STRING)
