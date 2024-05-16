@@ -14,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("auth")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000") // CORS 설정 추가
 public class AuthController {
   private final UserService userService;
   private final JWTUtil jwtUtil;
@@ -40,21 +38,28 @@ public class AuthController {
 
   @PostMapping(value = "/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, String>> getToken(HttpServletResponse response, @RequestBody Map<String, Object> mapObj) {
-    String email = mapObj.get("email").toString();
-    String pass = mapObj.get("pass").toString();
+    // email과 pass 값이 null인지 확인
+    String email = mapObj.get("email") != null ? mapObj.get("email").toString() : "";
+    String pass = mapObj.get("pass") != null ? mapObj.get("pass").toString() : "";
+
     log.info(email + "/" + pass);
-    String token = userService.login(email, pass, jwtUtil);
-    Map<String, String > map= new HashMap<>();
-    if (token != "" && token.length() > 1) {
-      /*try {
-        response.setContentType("text/plain");
-        response.getOutputStream().write(token.getBytes());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }*/
-        map.put("token", token);
+
+    // email과 pass가 유효한지 확인
+    if (email.isEmpty() || pass.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
+
+    String token = userService.login(email, pass, jwtUtil);
+    Map<String, String> map = new HashMap<>();
+
+    // token이 유효한지 확인
+    if (token != null && !token.isEmpty()) {
+      map.put("token", token);
+    } else {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
   @PostMapping("/logout")
@@ -66,7 +71,7 @@ public class AuthController {
       new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
       return new ResponseEntity<>(new ResponseDTO("success", true), HttpStatus.OK);
     } catch (Exception e) {
-      return new ResponseEntity<>(new ResponseDTO(e.getMessage(), false), HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(new ResponseDTO(e.getMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
