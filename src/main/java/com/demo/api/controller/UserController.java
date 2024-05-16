@@ -47,10 +47,7 @@ public class UserController {
   {
     "id":"user105@example.com",
       "password":"1",
-      "name":"사용자105",
-      "gender":"남",
       "email":"user105@example.com",
-      "mobile":"010-1234-1234",
       "fromSocial":false,
       "roleSet":["ROLE_USER"]
   }

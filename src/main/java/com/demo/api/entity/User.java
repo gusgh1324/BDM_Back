@@ -22,13 +22,7 @@ public class User extends BaseEntity {
   private Long mno;
 
   @Column(unique = true)
-  private String id;
-
-  @Column(unique = true)
   private String name;
-
-  @Column(name = "user_id", unique = true, nullable = false)
-  private String userId;
 
   @Column(name = "email", unique = true, nullable = false)
   private String email;
