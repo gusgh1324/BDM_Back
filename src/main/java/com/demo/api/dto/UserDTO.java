@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDTO {
-  private String userId;
   private String email;
   private String password;
   private String userImage;
   private Long dataStorage;
   private UserRole role; //role 필드 추가
+  private boolean fromSocial; // 소셜 로그인 여부를 나타내는 필드 추가
 }
 //UserDTO에는 id와 role 필드가 없다.
 // 이는 클라이언트에게 전달할 때 민감한 정보를 제외하기 위함.

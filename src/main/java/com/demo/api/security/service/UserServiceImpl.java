@@ -78,5 +78,11 @@ public class UserServiceImpl implements UserService {
     return token;
   }
 
+  @Override
+  public UserDTO findByEmail(String email, boolean social) {
+    Optional<User> user = userRepository.findByEmail(email, social);
+    return user.map(this::entityToDTO).orElse(null);
+  }
+
 }
 

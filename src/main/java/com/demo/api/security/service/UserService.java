@@ -5,7 +5,6 @@ import com.demo.api.entity.User;
 import com.demo.api.security.util.JWTUtil;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserService {
   default User dtoToEntity(UserDTO userDTO) {
@@ -42,9 +41,5 @@ public interface UserService {
 
   String login(String email, String pass, JWTUtil jwtUtil);
 
-  Map<String, Object> getGoogleUserInfo(String accessToken);
-
-  User findByEmail(String email);
-
-  void save(User user);
+  UserDTO findByEmail(String email, boolean social);
 }
