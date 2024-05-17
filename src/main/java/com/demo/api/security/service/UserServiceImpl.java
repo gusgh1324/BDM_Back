@@ -53,16 +53,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String login(String email, String pass, JWTUtil jwtUtil) {
+  public String login(String email, String pass, JWTUtil jwtUtil, boolean isSocial) {
     log.info("login................");
     String token = "";
-    UserDTO userDTO;
-    Optional<User> result = userRepository.findByEmail(email, false);
+    Optional<User> result = userRepository.findByEmail(email, isSocial);
     if (result.isPresent()) {
-      userDTO = entityToDTO(result.get());
+      UserDTO userDTO = entityToDTO(result.get());
       log.info("serviceimpl result : " + userDTO);
-      log.info("matches: " + passwordEncoder.matches(pass, userDTO.getPassword()));
-      if (passwordEncoder.matches(pass, userDTO.getPassword())) {
+      if (isSocial || passwordEncoder.matches(pass, userDTO.getPassword())) {
         try {
           token = jwtUtil.generateToken(email);
           log.info("token : " + token);

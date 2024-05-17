@@ -9,10 +9,12 @@ import java.util.List;
 public interface UserService {
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
-            .password(userDTO.getPassword())
+            .name(userDTO.getName())
             .email(userDTO.getEmail())
+            .password(userDTO.getPassword())
             .userImage(userDTO.getUserImage())
             .dataStorage(userDTO.getDataStorage())
+            .fromSocial(userDTO.isFromSocial())
             .role(userDTO.getRole())
             .build();
     return user;
@@ -20,10 +22,12 @@ public interface UserService {
 
   default UserDTO entityToDTO(User user) {
     UserDTO userDTO = UserDTO.builder()
+            .name(user.getName())
             .email(user.getEmail())
             .password(user.getPassword())
             .userImage(user.getUserImage())
             .dataStorage(user.getDataStorage())
+            .fromSocial(user.isFromSocial())
             .role(user.getRole())
             .build();
     return userDTO;
@@ -39,7 +43,7 @@ public interface UserService {
 
   List<UserDTO> getAllUsers();
 
-  String login(String email, String pass, JWTUtil jwtUtil);
+  String login(String email, String pass, JWTUtil jwtUtil, boolean isSocial);
 
   UserDTO findByEmail(String email, boolean social);
 }

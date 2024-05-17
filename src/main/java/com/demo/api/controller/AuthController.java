@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +62,7 @@ public class AuthController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    String token = userService.login(email, pass, jwtUtil);
+    String token = userService.login(email, pass, jwtUtil, false);
     Map<String, String> map = new HashMap<>();
 
     if (token != null && !token.isEmpty()) {
@@ -123,16 +124,21 @@ public class AuthController {
         String name = (String) payload.get("name");
 
         if (emailVerified) {
-          UserDTO userDTO = userService.findByEmail(email, true); // 소셜 로그인 여부를 true로 설정
+          UserDTO userDTO = userService.findByEmail(email, true);
           if (userDTO == null) {
             userDTO = new UserDTO();
             userDTO.setEmail(email);
             userDTO.setPassword(""); // 구글 로그인 사용자의 경우 비밀번호는 빈 문자열로 설정
-            userDTO.setFromSocial(true); // 소셜 로그인 여부 설정
+            userDTO.setFromSocial(true);
+            userDTO.setName(name); // 이름 설정 추가
             userService.registerUser(userDTO);
+          } else if (!userDTO.isFromSocial()) {
+            // 동일 이메일이 소셜 로그인이 아닌 경우
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
           }
 
-          String jwt = userService.login(email, "", jwtUtil);
+          // 이미 존재하는 소셜 사용자이거나 새로 등록된 사용자에 대해 JWT 생성 및 반환
+          String jwt = userService.login(email, "", jwtUtil, true);
           Map<String, String> response = new HashMap<>();
           response.put("token", jwt);
           return new ResponseEntity<>(response, HttpStatus.OK);
@@ -151,6 +157,7 @@ public class AuthController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
   }
+
 
 
   private String getClientId() throws IOException {
