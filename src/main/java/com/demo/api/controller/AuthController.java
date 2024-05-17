@@ -122,7 +122,7 @@ public class AuthController {
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String email = payload.getEmail();
-        boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+        boolean emailVerified = payload.getEmailVerified();
         String name = (String) payload.get("name");
         String picture = (String) payload.get("picture"); // 프로필 이미지 URL 가져오기
 

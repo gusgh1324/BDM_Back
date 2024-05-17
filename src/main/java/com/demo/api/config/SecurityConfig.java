@@ -35,6 +35,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
   private static final String[] PERMIT_ALL_LIST = {
+          "/members/me",
           "/auth/join", "/auth/login", "/auth/google-login",
           "/api/fish-disease/detect",
           "/api/fish-disease/info/**"
@@ -113,7 +114,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(List.of("http://localhost:3000"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
