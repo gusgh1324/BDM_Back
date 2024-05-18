@@ -16,7 +16,7 @@ public class UserDTO {
   private String userImage;
   private Long dataStorage;
   private String name;
-  private UserRole role; //role 필드 추가
+  private UserRole role = UserRole.USER; //기본값을 USER로 설정
   private boolean fromSocial = false; // 기본값을 false로 설정
 }
 //UserDTO에는 id와 role 필드가 없다.

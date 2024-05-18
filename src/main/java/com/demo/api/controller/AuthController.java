@@ -2,6 +2,7 @@ package com.demo.api.controller;
 
 import com.demo.api.dto.UserDTO;
 import com.demo.api.dto.ResponseDTO;
+import com.demo.api.entity.UserRole;
 import com.demo.api.security.service.UserService;
 import com.demo.api.security.util.JWTUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
@@ -135,6 +136,7 @@ public class AuthController {
             userDTO.setFromSocial(true);
             userDTO.setName(name); // 이름 설정 추가
             userDTO.setUserImage(picture); // 프로필 이미지 URL 설정
+            userDTO.setRole(UserRole.USER);
             userService.registerUser(userDTO);
           } else if (!userDTO.isFromSocial()) {
             // 동일 이메일이 소셜 로그인이 아닌 경우
