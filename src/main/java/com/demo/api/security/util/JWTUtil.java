@@ -30,4 +30,5 @@ public class JWTUtil { // JSON 웹 토큰 생성을 위한 클래스
     Claims claims = (Claims) Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8))).build().parse(tokenStr).getPayload();
     return (String) claims.get("sub");
   }
+
 }

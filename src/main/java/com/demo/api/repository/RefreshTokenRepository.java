@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
   Optional<RefreshToken> findByUserId(Long userId); // 사용자 ID를 기준으로 리프레시 토큰을 조회하는 기능을 제공
-  Optional<RefreshToken> findByToken(String Token); //리프레시 토큰을 기준으로 리프레시 토큰을 조회하는 기능을 제공
 
   @Modifying //Modifying, Transactional :  삭제 작업이 트랜잭션 내에서 수행되도록 설정
   @Transactional

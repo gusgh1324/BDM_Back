@@ -97,13 +97,15 @@ public class AuthController {
     }
 
     try {
-      String clientId = getClientId();
-      String clientSecret = getClientSecret();
+      Map<String, String> googleClient = getGoogleClient();
+      String clientId = googleClient.get("client_id");
+      String clientSecret = googleClient.get("client_secret");
+      String tokenUri = googleClient.get("token_uri");
 
       GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
               GoogleNetHttpTransport.newTrustedTransport(),
               JSON_FACTORY,
-              "https://oauth2.googleapis.com/token",
+              tokenUri,
               clientId,
               clientSecret,
               code,
@@ -120,8 +122,9 @@ public class AuthController {
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String email = payload.getEmail();
-        boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+        boolean emailVerified = payload.getEmailVerified();
         String name = (String) payload.get("name");
+        String picture = (String) payload.get("picture"); // 프로필 이미지 URL 가져오기
 
         if (emailVerified) {
           UserDTO userDTO = userService.findByEmail(email, true);
@@ -131,6 +134,7 @@ public class AuthController {
             userDTO.setPassword(""); // 구글 로그인 사용자의 경우 비밀번호는 빈 문자열로 설정
             userDTO.setFromSocial(true);
             userDTO.setName(name); // 이름 설정 추가
+            userDTO.setUserImage(picture); // 프로필 이미지 URL 설정
             userService.registerUser(userDTO);
           } else if (!userDTO.isFromSocial()) {
             // 동일 이메일이 소셜 로그인이 아닌 경우
@@ -156,18 +160,6 @@ public class AuthController {
       log.error("Invalid ID token format", e);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-  }
-
-
-
-  private String getClientId() throws IOException {
-    Map<String, String> googleClient = getGoogleClient();
-    return googleClient.get("client_id");
-  }
-
-  private String getClientSecret() throws IOException {
-    Map<String, String> googleClient = getGoogleClient();
-    return googleClient.get("client_secret");
   }
 
   private Map<String, String> getGoogleClient() throws IOException {

@@ -36,6 +36,7 @@ public class SecurityConfig {
 
   private static final String[] PERMIT_ALL_LIST = {
           "/auth/join", "/auth/login", "/auth/google-login",
+          "/members/me",
           "/api/fish-disease/detect",
           "/api/fish-disease/info/**"
   };
