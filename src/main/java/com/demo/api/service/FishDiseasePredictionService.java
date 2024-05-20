@@ -36,6 +36,9 @@ public interface FishDiseasePredictionService {
     return fishDiseasePredictionDTO;
   }
 
-  // 분석 결과를 DB에 저장
+  // 다중 분석 결과를 DB에 저장
   List<FishDiseasePrediction> savePredictions(List<FishDiseasePrediction> predictions);
+
+  // 단일 분석 결과를 DB에 저장(불필요시 삭제해도됨)
+  FishDiseasePrediction savePrediction(FishDiseasePrediction prediction);
 }

@@ -15,18 +15,6 @@ import java.io.PrintWriter;
 
 @Log4j2
 public class ApiLoginFailHandler implements AuthenticationFailureHandler {
-//  @Override
-//  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-//    log.info("login fail handler....exception.getMessage(): " + exception.getMessage());
-//    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//    response.setContentType("application/json;charset=urf-8");
-//    JSONObject jsonObject = new JSONObject();
-//    String message = exception.getMessage();
-//    jsonObject.put("code", "401");
-//    jsonObject.put("message", message);
-//    PrintWriter printWriter = response.getWriter();
-//    printWriter.print(jsonObject);
-//  }
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
     log.info("onAuthenticationFailure>>" + request.getContextPath());
