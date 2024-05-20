@@ -35,22 +35,22 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
   private static final String[] PERMIT_ALL_LIST = {
-          "/members/me",
-          "/auth/join", "/auth/login", "/auth/google-login",
-          "/api/fish-disease/detect",
-          "/api/fish-disease/info/**"
+      "/members/me",
+      "/auth/join", "/auth/login", "/auth/google-login",
+      "/api/fish-disease/detect",
+      "/api/fish-disease/info/**"
   };
 
   private static final String[] AUTHENTICATED_LIST = {
-          "/api/fish-images/**",
-          "/api/detection-history/**",
-          "/api/user-profile/**"
+      "/api/fish-images/**",
+      "/api/detection-history/**",
+      "/api/user-profile/**"
   };
 
   private static final String[] ADMIN_LIST = {
-          "/api/admin/**",
-          "/api/fish-disease/manage/**",
-          "/api/user-management/**"
+      "/api/admin/**",
+      "/api/fish-disease/manage/**",
+      "/api/user-management/**"
   };
 
   @Bean
@@ -61,22 +61,22 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-              authorizationManagerRequestMatcherRegistry.requestMatchers(PERMIT_ALL_LIST).permitAll();
-              authorizationManagerRequestMatcherRegistry.requestMatchers(AUTHENTICATED_LIST).authenticated();
-              authorizationManagerRequestMatcherRegistry.requestMatchers(ADMIN_LIST).hasAuthority("ADMIN");
-              authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
-            })
-            .addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(apiLoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement(sessionManagementConfigurer ->
-                    sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .requestCache(cache -> {
-              HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-              requestCache.setMatchingRequestParameterName(null);
-              cache.requestCache(requestCache);
-            })
-            .cors(withDefaults());
+        .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
+          authorizationManagerRequestMatcherRegistry.requestMatchers(PERMIT_ALL_LIST).permitAll();
+          authorizationManagerRequestMatcherRegistry.requestMatchers(AUTHENTICATED_LIST).authenticated();
+          authorizationManagerRequestMatcherRegistry.requestMatchers(ADMIN_LIST).hasAuthority("ADMIN");
+          authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
+        })
+        .addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(apiLoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+        .sessionManagement(sessionManagementConfigurer ->
+            sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .requestCache(cache -> {
+          HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+          requestCache.setMatchingRequestParameterName(null);
+          cache.requestCache(requestCache);
+        })
+        .cors(withDefaults());
 
     return http.build();
   }
@@ -94,9 +94,9 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     String[] patterns = {
-            "/api/fish-images/*",
-            "/api/detection-history/*",
-            "/api/user-profile/*"
+        "/api/fish-images/*",
+        "/api/detection-history/*",
+        "/api/user-profile/*"
     };
     return new ApiCheckFilter(patterns, jwtUtil());
   }
