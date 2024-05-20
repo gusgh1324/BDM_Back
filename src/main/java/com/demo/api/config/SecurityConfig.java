@@ -38,7 +38,8 @@ public class SecurityConfig {
           "/members/me",
           "/auth/join", "/auth/login", "/auth/google-login",
           "/api/fish-disease/detect",
-          "/api/fish-disease/info/**"
+          "/api/fish-disease/info/**",
+          "/api/predictions/analyze_image"
   };
 
   private static final String[] AUTHENTICATED_LIST = {
