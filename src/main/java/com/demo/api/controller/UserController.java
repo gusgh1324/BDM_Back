@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @Log4j2
-@RequestMapping("/members/")
+@RequestMapping("members")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000") // CORS 설정 추가
 public class UserController {
@@ -64,7 +64,6 @@ public class UserController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
-
 /*
   {
     "id":"user105@example.com",

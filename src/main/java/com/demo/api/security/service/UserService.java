@@ -9,27 +9,27 @@ import java.util.List;
 public interface UserService {
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
-            .name(userDTO.getName())
-            .email(userDTO.getEmail())
-            .password(userDTO.getPassword())
-            .userImage(userDTO.getUserImage())
-            .dataStorage(userDTO.getDataStorage())
-            .fromSocial(userDTO.isFromSocial())
-            .role(userDTO.getRole())
-            .build();
+        .name(userDTO.getName())
+        .email(userDTO.getEmail())
+        .password(userDTO.getPassword())
+        .userImage(userDTO.getUserImage())
+        .dataStorage(userDTO.getDataStorage())
+        .fromSocial(userDTO.isFromSocial())
+        .role(userDTO.getRole())
+        .build();
     return user;
   }
 
   default UserDTO entityToDTO(User user) {
     UserDTO userDTO = UserDTO.builder()
-            .name(user.getName())
-            .email(user.getEmail())
-            .password(user.getPassword())
-            .userImage(user.getUserImage())
-            .dataStorage(user.getDataStorage())
-            .fromSocial(user.isFromSocial())
-            .role(user.getRole())
-            .build();
+        .name(user.getName())
+        .email(user.getEmail())
+        .password(user.getPassword())
+        .userImage(user.getUserImage())
+        .dataStorage(user.getDataStorage())
+        .fromSocial(user.isFromSocial())
+        .role(user.getRole())
+        .build();
     return userDTO;
   }
 
