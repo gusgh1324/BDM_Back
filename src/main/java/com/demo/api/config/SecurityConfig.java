@@ -40,7 +40,8 @@ public class SecurityConfig {
           "/members/me",
           "/api/fish-disease/detect",
           "/api/fish-disease/info/**",
-          "/api/predictions/analyze_image"
+          "/api/predictions/analyze_image",
+          "/api/fish-disease/**"
   };
 
   private static final String[] AUTHENTICATED_LIST = {

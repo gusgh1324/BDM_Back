@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Log4j2
 @RequestMapping("/api/fish-disease")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000") // CORS 설정 추가
 public class FishDiseaseController {
   private final FishDiseaseService fishDiseaseService;
   private final FishDiseasePredictionService predictionService;
