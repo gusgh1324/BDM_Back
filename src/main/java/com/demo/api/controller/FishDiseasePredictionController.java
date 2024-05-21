@@ -11,14 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -37,53 +41,63 @@ public class FishDiseasePredictionController {
   @Value("${python.script.path}")
   private String pythonScriptPath;
 
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private SseEmitter emitter = new SseEmitter();
+
   // 리액트에서 업로드한 이미지를 전달받아 파이썬 파일로 이미지 데이터를 전달시켜 이미지 분류 시작
-  @PostMapping(value = "/analyze_image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/analyze_image", consumes = "multipart/form-data")
   public ResponseEntity<?> analyzeImage(@RequestParam("image") MultipartFile image) {
     try {
-      // 업로드된 이미지를 임시 파일로 저장
       Path tempFile = Files.createTempFile("uploaded_image", image.getOriginalFilename());
       image.transferTo(tempFile);
 
-      // Python 스크립트 실행
       ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath, tempFile.toString());
       Process process = pb.start();
 
-      // 파이썬 스크립트의 출력을 읽기
-      StringBuilder output = new StringBuilder();
-      try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-           BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+      executor.submit(() -> {
+        try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+             BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
 
-        // 표준 출력 스트림 읽기
-        String line;
-        while ((line = stdOutReader.readLine()) != null) {
-          System.out.println("STDOUT: " + line);  // 콘솔에 출력
-          output.append(line).append("\n");
+          String line;
+          while ((line = stdOutReader.readLine()) != null) {
+            System.out.println("STDOUT: " + line);  // 콘솔에 출력
+            emitter.send(SseEmitter.event().name("progress").data(line));
+          }
+
+          while ((line = stdErrReader.readLine()) != null) {
+            System.err.println("STDERR: " + line);  // 콘솔에 출력
+            emitter.send(SseEmitter.event().name("progress").data(line));
+          }
+        } catch (IOException e) {
+          emitter.completeWithError(e);
         }
+      });
 
-        // 표준 오류 스트림 읽기
-        while ((line = stdErrReader.readLine()) != null) {
-          System.err.println("STDERR: " + line);  // 콘솔에 출력
-          output.append(line).append("\n");
-        }
-      }
-
-      // 프로세스가 종료될 때까지 대기
       int exitCode = process.waitFor();
-
-      // 임시 파일 삭제
       Files.delete(tempFile);
 
-      // 종료 코드 확인 및 결과값 반환
       if (exitCode == 0) {
-        return ResponseEntity.ok("Analysis complete:\n" + output.toString());
+        emitter.send(SseEmitter.event().name("complete").data("Analysis complete"));
+        emitter.complete();
+        return ResponseEntity.ok("Analysis complete");
       } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image analysis failed with exit code " + exitCode + ":\n" + output.toString());
+        emitter.send(SseEmitter.event().name("error").data("Image analysis failed"));
+        emitter.complete();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image analysis failed with exit code " + exitCode);
       }
     } catch (IOException | InterruptedException e) {
       log.error("Error during image analysis", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during image analysis: " + e.getMessage());
     }
+  }
+
+  //별도의 이미터를 보내는 get요청을 작성
+  @GetMapping("/stream")
+  public SseEmitter stream() {
+    if (emitter == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+    return emitter;
   }
 
   @PostMapping("/save")
