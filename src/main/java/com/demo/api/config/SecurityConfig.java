@@ -41,7 +41,7 @@ public class SecurityConfig {
           "/api/fish-disease/detect",
           "/api/fish-disease/info/**",
           "/api/predictions/analyze_image",
-          "/api/fish-disease/**"
+          "/api/fish-disease/**", "/api/predictions/save"
   };
 
   private static final String[] AUTHENTICATED_LIST = {

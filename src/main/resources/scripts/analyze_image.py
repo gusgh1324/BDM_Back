@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import json
+import requests
 
 # Python의 표준 출력과 표준 오류를 UTF-8로 설정
 sys.stdout.reconfigure(encoding='utf-8')
@@ -15,6 +16,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 image_path = sys.argv[1]
+spring_url = 'http://localhost:8089/server/api/predictions/save'  # Spring Boot 애플리케이션의 엔드포인트 URL
 
 # 현재 작업 디렉토리 출력
 print(f"현재 작업 디렉토리: {os.getcwd()}")
@@ -68,11 +70,31 @@ def analyze_image(image_path):
         print(f"{idx + 1}/{len(model_paths)} 분석 완료")
 
     return results
+def send_to_spring(result, url):
+    # 데이터를 JSON 형식으로 변환
+    prediction_list = [
+        {
+            "modelName": model_name,
+            "림포시스티스병": probabilities['림포시스티스병'],
+            "비브리오": probabilities['비브리오'],
+            "아가미흡충": probabilities['아가미흡충'],
+            "연쇄구균병": probabilities['연쇄구균병']
+        }
+        for model_name, probabilities in result
+    ]
 
+    # POST 요청을 통해 데이터 전송
+    response = requests.post(url, json=prediction_list)
+
+    # 응답 확인
+    if response.status_code == 200:
+        print("데이터가 성공적으로 전송되었습니다.")
+    else:
+        print(f"데이터 전송에 실패했습니다. 상태 코드: {response.status_code}")
+        print(response.text)
 if __name__ == "__main__":
     # 이미지 분석 결과 출력
     result = analyze_image(image_path)
     print(result)
-    # 결과를 Python 리스트로 변환하여 JSON으로 직렬화
-    json_result = json.dumps(result, ensure_ascii=False, indent=4)
-    print(json_result)
+    # 결과를 Spring Boot 엔드포인트로 전송
+    send_to_spring(result, spring_url)

@@ -86,7 +86,7 @@ public class FishDiseasePredictionController {
     }
   }
 
-  @PostMapping
+  @PostMapping("/save")
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
     return service.savePredictions(predictions);
   }
