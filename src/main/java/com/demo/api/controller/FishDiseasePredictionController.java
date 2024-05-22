@@ -87,6 +87,7 @@ public class FishDiseasePredictionController {
       }
     } catch (IOException | InterruptedException e) {
       log.error("Error during image analysis", e);
+      emitter.complete();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during image analysis: " + e.getMessage());
     }
   }
@@ -100,11 +101,13 @@ public class FishDiseasePredictionController {
     return emitter;
   }
 
+  // 사진 분석 결과를 DB에 저장
   @PostMapping("/save")
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
     return service.savePredictions(predictions);
   }
 
+  // DB에 저장된 사진 분석결과를 전부 불러오기
   @GetMapping("/latest")
   public List<FishDiseasePrediction> getLatestPredictions() {
     return service.findAllPredictions();
