@@ -104,4 +104,9 @@ public class FishDiseasePredictionController {
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
     return service.savePredictions(predictions);
   }
+
+  @GetMapping("/latest")
+  public List<FishDiseasePrediction> getLatestPredictions() {
+    return service.findAllPredictions();
+  }
 }
