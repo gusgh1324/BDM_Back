@@ -1,9 +1,6 @@
 package com.demo.api.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -21,7 +18,13 @@ public class FishDiseasePrediction {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id; // 프론트에서 업로드한 이미지의 ID
 
+  //사진id
+  @ManyToOne
+  @JoinColumn(name = "photo_id", referencedColumnName = "id")
+  private Photo photo;
+
   private String modelName; // 현재 기준 CNN, 전이학습, DNN이 들어갈 예정
+
   private double 림포시스티스병; // 단위 %
   private double 비브리오; // 단위 %
   private double 아가미흡충; // 단위 %

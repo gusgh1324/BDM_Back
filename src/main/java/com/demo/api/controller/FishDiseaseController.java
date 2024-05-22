@@ -3,8 +3,10 @@ package com.demo.api.controller;
 import com.demo.api.dto.FishDiseaseRequestDTO;
 import com.demo.api.dto.FishDiseaseResponseDTO;
 import com.demo.api.entity.FishDiseasePrediction;
+import com.demo.api.entity.Photo;
 import com.demo.api.service.FishDiseasePredictionService;
 import com.demo.api.service.FishDiseaseService;
+import com.demo.api.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FishDiseaseController {
   private final FishDiseaseService fishDiseaseService;
   private final FishDiseasePredictionService predictionService;
+  private final PhotoService photoService;
 
   @PostMapping(value = "/detect", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<FishDiseaseResponseDTO> detectFishDisease(
@@ -45,6 +48,12 @@ public class FishDiseaseController {
       FishDiseaseRequestDTO requestDTO = new FishDiseaseRequestDTO();
       requestDTO.setImagePath(imagePath);
       FishDiseaseResponseDTO responseDTO = fishDiseaseService.analyzeFishDisease(requestDTO);
+//
+//      // Photo 엔티티 생성 및 저장
+//      Photo photo = Photo.builder()
+//          .imageUrl(imagePath)
+//          .build();
+//      photoService.savePhoto(photo);
 
       // 분석 결과를 FishDiseasePrediction으로 변환하여 DB에 저장
       FishDiseasePrediction prediction = FishDiseasePrediction.builder()

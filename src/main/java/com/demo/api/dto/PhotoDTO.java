@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 public class PhotoDTO {
   private Long id; //사진의 고유 식별자
   private String title; //사진의 제목
-  private String description; // 사진의 설명
   private String imageUrl; //사진의 URL 주소
 }

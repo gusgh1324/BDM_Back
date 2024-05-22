@@ -3,6 +3,9 @@ package com.demo.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -13,16 +16,27 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //uid  ===> uesr.mno와 연결
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "mno")
+    private User user;
 
     private String title; //사진의 제목
 
     private String imageUrl; //사진의 URL 주소
 
-    @Column(name = "result_text")//분석결과
-    private String resultText;
+    // 사진id
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FishDiseasePrediction> predictions = new ArrayList<>();
 
 
     // 다른 필드들
+    public void addPrediction(FishDiseasePrediction prediction) {
+        predictions.add(prediction);
+        prediction.setPhoto(this);
+    }
+
+    public void removePrediction(FishDiseasePrediction prediction) {
+        predictions.remove(prediction);
+        prediction.setPhoto(null);
+    }
 }
