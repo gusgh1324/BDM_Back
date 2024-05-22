@@ -23,4 +23,9 @@ public class FishDiseasePredictionServiceImpl implements FishDiseasePredictionSe
     return repository.save(prediction); //메서드를 호출하여 예측 결과를 DB에 저장(단일)
     // 마찬가지로 불필요시 삭제
   }
+
+  @Override
+  public List<FishDiseasePrediction> findAllPredictions() {
+    return repository.findAll();
+  }
 }

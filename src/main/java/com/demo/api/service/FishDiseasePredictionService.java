@@ -2,9 +2,6 @@ package com.demo.api.service;
 
 import com.demo.api.dto.FishDiseasePredictionDTO;
 import com.demo.api.entity.FishDiseasePrediction;
-import com.demo.api.repository.FishDiseasePredictionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -41,4 +38,7 @@ public interface FishDiseasePredictionService {
 
   // 단일 분석 결과를 DB에 저장(불필요시 삭제해도됨)
   FishDiseasePrediction savePrediction(FishDiseasePrediction prediction);
+
+  // selectAll
+  List<FishDiseasePrediction> findAllPredictions();
 }
