@@ -1,12 +1,17 @@
 package com.demo.api.service;
 
 import com.demo.api.dto.PhotoDTO;
-import com.demo.api.entity.Photo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 public interface PhotoService {
-  Photo savePhoto(String imageUrl, String title);
+  // 사진 업로드
+  void uploadPhoto(PhotoDTO photoDTO);
 
+  // 사진 조회
+  PhotoDTO getPhotoById(Long id);
+
+  // 사진 리스트 조회
+  List<PhotoDTO> getAllPhotos();
+
+  // 사진 삭제
+  void deletePhoto(Long id);
 }

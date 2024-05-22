@@ -28,4 +28,9 @@ public class FishDiseasePredictionServiceImpl implements FishDiseasePredictionSe
   public List<FishDiseasePrediction> findAllPredictions() {
     return repository.findAll();
   }
+
+  @Override
+  public List<FishDiseasePrediction> findByImageUrl(String imageUrl) {
+    return repository.findByImageUrl(imageUrl);
+  }
 }

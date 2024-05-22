@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,9 +49,6 @@ public class User extends BaseEntity {
   @ElementCollection(fetch= FetchType.LAZY)
   @Builder.Default
   private Set<UserRole> roleSet = new HashSet<>();
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Photo> photos = new ArrayList<>();
 
   //패스워드 변경, 사용자 이미지 업데이트, 데이터 스토리지 업데이트를 위한 메서드를 추가로 정의했습니다.
   public void updatePassword(String password) {

@@ -41,4 +41,7 @@ public interface FishDiseasePredictionService {
 
   // selectAll
   List<FishDiseasePrediction> findAllPredictions();
+
+  // select
+  List<FishDiseasePrediction> findByImageUrl(String imageUrl);
 }

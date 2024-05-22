@@ -42,6 +42,7 @@ public class FishDiseasePredictionController {
   private String pythonScriptPath;
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
   private SseEmitter emitter = new SseEmitter();
 
   // 리액트에서 업로드한 이미지를 전달받아 파이썬 파일로 이미지 데이터를 전달시켜 이미지 분류 시작
@@ -75,6 +76,7 @@ public class FishDiseasePredictionController {
       });
 
       int exitCode = process.waitFor();
+
       Files.delete(tempFile);
 
       if (exitCode == 0) {
@@ -109,6 +111,13 @@ public class FishDiseasePredictionController {
   @GetMapping("/latest")
   public List<FishDiseasePrediction> getLatestPredictions() {
     return service.findAllPredictions();
+  }
+
+  @PostMapping(value = "/select", consumes = "multipart/form-data")
+  public List<FishDiseasePrediction> sendPredictionToClient(@RequestParam("image") MultipartFile image) throws IOException {
+    Path tempFile = Files.createTempFile("uploaded_image", image.getOriginalFilename());
+    String imageUrl = tempFile.toString();
+    return service.findByImageUrl(imageUrl);
   }
 
   // 이미터를 다시 생성하는 메서드
