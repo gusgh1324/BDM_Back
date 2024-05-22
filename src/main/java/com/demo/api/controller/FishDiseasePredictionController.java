@@ -50,6 +50,7 @@ public class FishDiseasePredictionController {
     try {
       Path tempFile = Files.createTempFile("uploaded_image", image.getOriginalFilename());
       image.transferTo(tempFile);
+      reloadEmitter(); // 생성자에서 이미터 초기화
 
       ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath, tempFile.toString());
       Process process = pb.start();
@@ -78,16 +79,13 @@ public class FishDiseasePredictionController {
 
       if (exitCode == 0) {
         emitter.send(SseEmitter.event().name("complete").data("Analysis complete"));
-        emitter.complete();
         return ResponseEntity.ok("Analysis complete");
       } else {
         emitter.send(SseEmitter.event().name("error").data("Image analysis failed"));
-        emitter.complete();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image analysis failed with exit code " + exitCode);
       }
     } catch (IOException | InterruptedException e) {
       log.error("Error during image analysis", e);
-      emitter.complete();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during image analysis: " + e.getMessage());
     }
   }
@@ -112,4 +110,10 @@ public class FishDiseasePredictionController {
   public List<FishDiseasePrediction> getLatestPredictions() {
     return service.findAllPredictions();
   }
+
+  // 이미터를 다시 생성하는 메서드
+  private void reloadEmitter() {
+    emitter = new SseEmitter();
+  }
+
 }
