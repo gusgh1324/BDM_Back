@@ -22,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -56,23 +58,28 @@ public class FishDiseasePredictionController {
       ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath, tempFile.toString());
       Process process = pb.start();
 
-      executor.submit(() -> {
+      CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+        StringBuilder results = new StringBuilder();
         try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
              BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
 
           String line;
           while ((line = stdOutReader.readLine()) != null) {
-            System.out.println("STDOUT: " + line);  // 콘솔에 출력
-            emitter.send(SseEmitter.event().name("progress").data(line));
+            System.out.println("STDOUT: " + line);
+            if (line.startsWith("RESULT:")) {
+              results.append(line.substring(7));  // "RESULT:" 이후의 부분을 저장
+            }
           }
 
           while ((line = stdErrReader.readLine()) != null) {
-            System.err.println("STDERR: " + line);  // 콘솔에 출력
+            System.err.println("STDERR: " + line);
             emitter.send(SseEmitter.event().name("progress").data(line));
           }
+
         } catch (IOException e) {
           emitter.completeWithError(e);
         }
+        return results.toString();
       });
 
       int exitCode = process.waitFor();
@@ -80,13 +87,14 @@ public class FishDiseasePredictionController {
       Files.delete(tempFile);
 
       if (exitCode == 0) {
+        String results = future.get();
         emitter.send(SseEmitter.event().name("complete").data("Analysis complete"));
-        return ResponseEntity.ok("Analysis complete");
+        return ResponseEntity.ok(results);
       } else {
         emitter.send(SseEmitter.event().name("error").data("Image analysis failed"));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image analysis failed with exit code " + exitCode);
       }
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException | InterruptedException | ExecutionException e) {
       log.error("Error during image analysis", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during image analysis: " + e.getMessage());
     }
@@ -101,6 +109,13 @@ public class FishDiseasePredictionController {
     return emitter;
   }
 
+  // 이미터를 다시 생성하는 메서드
+  private void reloadEmitter() {
+    emitter = new SseEmitter();
+  }
+
+
+  /**
   // 사진 분석 결과를 DB에 저장
   @PostMapping("/save")
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
@@ -119,10 +134,5 @@ public class FishDiseasePredictionController {
     String imageUrl = tempFile.toString();
     return service.findByImageUrl(imageUrl);
   }
-
-  // 이미터를 다시 생성하는 메서드
-  private void reloadEmitter() {
-    emitter = new SseEmitter();
-  }
-
+  **/
 }

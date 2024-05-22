@@ -37,8 +37,8 @@ model_paths = [
 
 # 이미지를 분석하는 함수
 def analyze_image(image_path):
-    # 결과를 저장할 리스트
-    results = []
+    results = []    # 결과를 저장할 리스트
+    classes = ['림포시스티스병', '비브리오', '아가미흡충', '연쇄구균병']  # 클래스 레이블을 적절하게 수정
     print("분석 시작")
     # 각 모델에 대해 반복
     for idx, model_path in enumerate(model_paths):
@@ -58,9 +58,6 @@ def analyze_image(image_path):
         # 예측 수행
         prediction = model.predict(img_array)
 
-        # 클래스 레이블 가져오기
-        classes = ['림포시스티스병', '비브리오', '아가미흡충', '연쇄구균병']  # 클래스 레이블을 적절하게 수정
-
         # 클래스 별 확률 가져오기
         class_probabilities = {class_name: f"{probability * 100:.2f}" for class_name, probability in zip(classes, prediction[0])}
 
@@ -72,6 +69,8 @@ def analyze_image(image_path):
         print(f"{idx + 1}/{len(model_paths)} 분석 완료")
 
     return results
+
+""" 
 def send_to_spring(result, url, url2, image_path):
     # 데이터를 JSON 형식으로 변환
     prediction_list = [
@@ -102,3 +101,8 @@ if __name__ == "__main__":
     print(result)
     # 결과를 Spring Boot 엔드포인트로 전송
     send_to_spring(result, spring_url, spring_url2, image_path)
+"""
+
+if __name__ == "__main__":
+    overAllResult = analyze_image(image_path)
+    print("RESULT:" + json.dumps(overAllResult, ensure_ascii=False))
