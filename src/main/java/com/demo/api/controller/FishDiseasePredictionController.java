@@ -45,7 +45,7 @@ public class FishDiseasePredictionController {
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-  private SseEmitter emitter = new SseEmitter();
+  private SseEmitter emitter;
 
   // 리액트에서 업로드한 이미지를 전달받아 파이썬 파일로 이미지 데이터를 전달시켜 이미지 분류 시작
   @PostMapping(value = "/analyze_image", consumes = "multipart/form-data")
@@ -58,7 +58,7 @@ public class FishDiseasePredictionController {
       ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath, tempFile.toString());
       Process process = pb.start();
 
-      CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+      executor.submit(() -> {
         StringBuilder results = new StringBuilder();
         try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
              BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
@@ -66,6 +66,7 @@ public class FishDiseasePredictionController {
           String line;
           while ((line = stdOutReader.readLine()) != null) {
             System.out.println("STDOUT: " + line);
+            emitter.send(SseEmitter.event().name("progress").data(line));
             if (line.startsWith("RESULT:")) {
               results.append(line.substring(7));  // "RESULT:" 이후의 부분을 저장
             }
@@ -73,34 +74,41 @@ public class FishDiseasePredictionController {
 
           while ((line = stdErrReader.readLine()) != null) {
             System.err.println("STDERR: " + line);
-            emitter.send(SseEmitter.event().name("progress").data(line));
           }
 
         } catch (IOException e) {
+          log.error("Error reading process output", e);
+          emitter.completeWithError(e);
+          return;  // 예외 발생 시 작업을 중단
+        }
+
+        try {
+          int exitCode = process.waitFor();
+          Files.delete(tempFile);
+
+          if (exitCode == 0) {
+            emitter.send(SseEmitter.event().name("complete").data("Analysis complete"));
+            emitter.send(SseEmitter.event().name("result").data(results.toString())); // 최종 결과 전송
+            emitter.complete();
+          } else {
+            emitter.send(SseEmitter.event().name("error").data("Image analysis failed"));
+            emitter.complete();
+          }
+        } catch (InterruptedException | IOException e) {
+          log.error("Error during process execution or file deletion", e);
           emitter.completeWithError(e);
         }
-        return results.toString();
       });
 
-      int exitCode = process.waitFor();
+      return ResponseEntity.ok("Image analysis started");
 
-      Files.delete(tempFile);
-
-      if (exitCode == 0) {
-        String results = future.get();
-        emitter.send(SseEmitter.event().name("complete").data("Analysis complete"));
-        return ResponseEntity.ok(results);
-      } else {
-        emitter.send(SseEmitter.event().name("error").data("Image analysis failed"));
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image analysis failed with exit code " + exitCode);
-      }
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException e) {
       log.error("Error during image analysis", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during image analysis: " + e.getMessage());
     }
   }
 
-  //별도의 이미터를 보내는 get요청을 작성
+  // 별도의 이미터를 보내는 get요청을 작성
   @GetMapping("/stream")
   public SseEmitter stream() {
     if (emitter == null) {
@@ -114,14 +122,13 @@ public class FishDiseasePredictionController {
     emitter = new SseEmitter();
   }
 
-
+  /**
   // 사진 분석 결과를 DB에 저장
   @PostMapping("/save")
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
     return service.savePredictions(predictions);
   }
 
-  /**
   // DB에 저장된 사진 분석결과를 전부 불러오기
   @GetMapping("/latest")
   public List<FishDiseasePrediction> getLatestPredictions() {
