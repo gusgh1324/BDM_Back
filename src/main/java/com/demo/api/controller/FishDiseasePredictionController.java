@@ -115,13 +115,13 @@ public class FishDiseasePredictionController {
   }
 
 
-  /**
   // 사진 분석 결과를 DB에 저장
   @PostMapping("/save")
   public List<FishDiseasePrediction> addPredictions(@RequestBody List<FishDiseasePrediction> predictions) {
     return service.savePredictions(predictions);
   }
 
+  /**
   // DB에 저장된 사진 분석결과를 전부 불러오기
   @GetMapping("/latest")
   public List<FishDiseasePrediction> getLatestPredictions() {

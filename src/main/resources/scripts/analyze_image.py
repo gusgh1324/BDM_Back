@@ -17,7 +17,6 @@ if len(sys.argv) < 2:
 
 image_path = sys.argv[1]
 spring_url = 'http://localhost:8089/server/api/predictions/save'  # Spring Boot 애플리케이션의 엔드포인트 URL
-spring_url2 = 'http://localhost:8089/server/api/predictions/select'
 
 # 현재 작업 디렉토리 출력
 print(f"현재 작업 디렉토리: {os.getcwd()}")
@@ -70,8 +69,7 @@ def analyze_image(image_path):
 
     return results
 
-""" 
-def send_to_spring(result, url, url2, image_path):
+def send_to_spring(result, url, image_path):
     # 데이터를 JSON 형식으로 변환
     prediction_list = [
         {
@@ -87,7 +85,6 @@ def send_to_spring(result, url, url2, image_path):
 
     # POST 요청을 통해 데이터 전송
     response = requests.post(url, json=prediction_list)
-    requests.post(url2, json=prediction_list)
 
     # 응답 확인
     if response.status_code == 200:
@@ -95,14 +92,16 @@ def send_to_spring(result, url, url2, image_path):
     else:
         print(f"데이터 전송에 실패했습니다. 상태 코드: {response.status_code}")
         print(response.text)
+"""
 if __name__ == "__main__":
     # 이미지 분석 결과 출력
     result = analyze_image(image_path)
     print(result)
     # 결과를 Spring Boot 엔드포인트로 전송
-    send_to_spring(result, spring_url, spring_url2, image_path)
+    send_to_spring(result, spring_url, image_path)
 """
 
 if __name__ == "__main__":
     overAllResult = analyze_image(image_path)
+    send_to_spring(overAllResult, spring_url, image_path)
     print("RESULT:" + json.dumps(overAllResult, ensure_ascii=False))
