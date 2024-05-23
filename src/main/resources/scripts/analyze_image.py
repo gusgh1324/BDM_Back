@@ -62,7 +62,7 @@ def analyze_image(image_path):
         class_probabilities = {class_name: f"{probability * 100:.2f}" for class_name, probability in zip(classes, prediction[0])}
 
         # 결과 튜플로 저장하여 리스트에 추가
-        result = (f"{['CNN', '전이학습', 'DNN'][idx]} 모델", class_probabilities)
+        result = (f"{['CNN', 'DNN', '전이학습'][idx]} 모델", class_probabilities)
         results.append(result)
 
         # 현재까지의 모델 분석 상태 출력
