@@ -62,7 +62,8 @@ public class UserServiceImpl implements UserService {
       log.info("serviceimpl result : " + userDTO);
       if (isSocial || passwordEncoder.matches(pass, userDTO.getPassword())) {
         try {
-          token = jwtUtil.generateToken(email);
+          // userId를 가져와서 토큰 생성 시 전달
+          token = jwtUtil.generateToken(email, userDTO.getMno());
           log.info("token : " + token);
         } catch (Exception e) {
           e.printStackTrace();

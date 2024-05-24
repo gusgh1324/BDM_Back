@@ -22,6 +22,7 @@ public interface UserService {
 
   default UserDTO entityToDTO(User user) {
     UserDTO userDTO = UserDTO.builder()
+            .mno(user.getMno())
         .name(user.getName())
         .email(user.getEmail())
         .password(user.getPassword())

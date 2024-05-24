@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDTO {
+  private Long mno;
   private String email;
   private String password;
   private String userImage;

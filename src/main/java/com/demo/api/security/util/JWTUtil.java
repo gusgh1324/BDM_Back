@@ -20,14 +20,15 @@ public class JWTUtil { // JSON 웹 토큰 생성을 위한 클래스
 
   private long expire = 60 * 24 * 30;
 
-  public String generateToken(String content) throws Exception {
+  public String generateToken(String content, Long userId) throws Exception {
     return Jwts.builder()
-        .claim("sub", content) //토큰이 보관할 컨텐츠
-        .issuer(issuer) // 이슈어 설정
-        .issuedAt(new Date()) // 생성일
-        .expiration(Date.from(ZonedDateTime.now().plusMinutes(expire).toInstant())) // 만기일
-        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8))) // 암호화
-        .compact();
+            .claim("sub", content) // 토큰이 보관할 컨텐츠
+            .claim("id", userId) // id 클레임 추가
+            .issuer(issuer) // 이슈어 설정
+            .issuedAt(new Date()) // 생성일
+            .expiration(Date.from(ZonedDateTime.now().plusMinutes(expire).toInstant())) // 만기일
+            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8))) // 암호화
+            .compact();
   }
 
   public String validateAndExtract(String tokenStr) throws Exception {
