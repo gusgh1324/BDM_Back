@@ -69,30 +69,31 @@ def analyze_image(image_path):
 
     return results
 
-# def send_to_spring(result, url, image_path):
-#     # 데이터를 JSON 형식으로 변환
-#     prediction_list = [
-#         {
-#             "modelName": model_name,
-#             "imageUrl":image_path,
-#             "림포시스티스병": probabilities['림포시스티스병'],
-#             "비브리오": probabilities['비브리오'],
-#             "아가미흡충": probabilities['아가미흡충'],
-#             "연쇄구균병": probabilities['연쇄구균병']
-#         }
-#         for model_name, probabilities in result
-#     ]
-#
-#     # POST 요청을 통해 데이터 전송
-#     response = requests.post(url, json=prediction_list)
-#
-#     # 응답 확인
-#     if response.status_code == 200:
-#         print("데이터가 성공적으로 전송되었습니다.")
-#     else:
-#         print(f"데이터 전송에 실패했습니다. 상태 코드: {response.status_code}")
-#         print(response.text)
 """
+def send_to_spring(result, url, image_path):
+    # 데이터를 JSON 형식으로 변환
+    prediction_list = [
+        {
+            "modelName": model_name,
+            "imageUrl":image_path,
+            "림포시스티스병": probabilities['림포시스티스병'],
+            "비브리오": probabilities['비브리오'],
+            "아가미흡충": probabilities['아가미흡충'],
+            "연쇄구균병": probabilities['연쇄구균병']
+        }
+        for model_name, probabilities in result
+    ]
+
+    # POST 요청을 통해 데이터 전송
+    response = requests.post(url, json=prediction_list)
+
+    # 응답 확인
+    if response.status_code == 200:
+        print("데이터가 성공적으로 전송되었습니다.")
+    else:
+        print(f"데이터 전송에 실패했습니다. 상태 코드: {response.status_code}")
+        print(response.text)
+
 if __name__ == "__main__":
     # 이미지 분석 결과 출력
     result = analyze_image(image_path)
