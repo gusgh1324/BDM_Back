@@ -1,17 +1,26 @@
 package com.demo.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.demo.api.entity.Photo;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter
+@Setter
 public class PhotoDTO {
-  private Long id; //사진의 고유 식별자
-  private String title; //사진의 제목
-  private String description; // 사진의 설명
-  private String imageUrl; //사진의 URL 주소
+  private String title;
+  private String imageUrl;
+
+  public Photo toEntity() {
+    return Photo.builder()
+        .title(extractAnalysisResult(title))
+        .imageUrl(imageUrl)
+        .build();
+  }
+  private String extractAnalysisResult(String url) {
+    int index = url.indexOf("?");
+    if (index != -1) {
+      return url.substring(index + 1);
+    }
+    return url;
+  }
 }

@@ -4,5 +4,5 @@ import com.demo.api.entity.Photo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
-    // 추가적인 쿼리 메서드 정의 가능
+    //  Photo 엔티티에 대한 저장, 조회, 삭제 작업이 수행될 때, 실제로 데이터베이스의 photo 테이블에 반영
 }

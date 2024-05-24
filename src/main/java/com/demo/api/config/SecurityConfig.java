@@ -41,6 +41,7 @@ public class SecurityConfig {
           "/api/fish-disease/detect",
           "/api/fish-disease/info/**",
           "/api/predictions/**",
+          "/api/saveAnalysis/**",
           "/api/fish-disease/**", "/api/predictions/save"
   };
 

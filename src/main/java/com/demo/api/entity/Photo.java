@@ -13,16 +13,14 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //uid  ===> uesr.mno와 연결
+    @Column(columnDefinition = "TEXT")
+    private String title; // 프론트 웹에서 분석한 주소(?이후)
 
+    @Column(name = "image_url")
+    private String imageUrl; //사진 자체의 URL 주소
 
-    private String title; //사진의 제목
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User userId;
 
-    private String imageUrl; //사진의 URL 주소
-
-    @Column(name = "result_text")//분석결과
-    private String resultText;
-
-
-    // 다른 필드들
 }
