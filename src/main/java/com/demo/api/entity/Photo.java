@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Photo {
@@ -13,14 +13,14 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
-    private String title; // 프론트 웹에서 분석한 주소(?이후)
+    @Column(name = "user_id")
+    private Long userId;
+    private String fileUrl;
+    private String analysisResult;
 
-    @Column(name = "image_url")
-    private String imageUrl; //사진 자체의 URL 주소
-
+    // @ManyToOne 애너테이션과 @JoinColumn 애너테이션을 사용하여 외래 키를 설정합니다.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User userId;
+    @JoinColumn(name = "user_id", referencedColumnName = "mno", insertable = false, updatable = false)
+    private User user;
 
 }

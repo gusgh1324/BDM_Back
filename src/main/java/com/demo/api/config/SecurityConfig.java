@@ -100,7 +100,7 @@ public class SecurityConfig {
     String[] patterns = {
             "/api/fish-images/*",
             "/api/detection-history/*",
-            "/api/user-profile/*"
+            "/api/user-profile/*",
     };
     return new ApiCheckFilter(patterns, jwtUtil());
   }
