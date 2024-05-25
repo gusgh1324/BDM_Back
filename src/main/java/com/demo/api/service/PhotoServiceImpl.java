@@ -38,12 +38,14 @@ public class PhotoServiceImpl implements PhotoService {
       Path targetLocation = this.fileStorageLocation.resolve(fileName);
       // 3. 파일 저장
       Files.copy(file.getInputStream(), targetLocation);
+      // 4. 파일 URL 생성
+      String fileUrl = "http://localhost:8089/server/api/saveAnalysis/" + fileName;
 
         Long userId = tokenProvider.getMemberId(token);
 
         Photo photo = Photo.builder()
                 .userId(userId)
-                .fileUrl(targetLocation.toString())
+                .fileUrl(fileUrl)
                 .analysisResult(analysisResult)
                 .build();
 
