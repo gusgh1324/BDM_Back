@@ -12,8 +12,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 @Log4j2
 @Validated
@@ -34,6 +37,7 @@ public class PhotoController {
     return photoService.savePhoto(token.replace("Bearer ", ""), request);
   }
 
+
   @GetMapping("/{filename}")
   public ResponseEntity<Resource> getImage(@PathVariable String filename) {
     try {
@@ -41,8 +45,9 @@ public class PhotoController {
       Resource resource = new UrlResource(filePath.toUri());
 
       if (resource.exists()) {
+        String encodedFileName = URLEncoder.encode(Objects.requireNonNull(resource.getFilename()), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
                 .body(resource);
       } else {
         return ResponseEntity.notFound().build();
